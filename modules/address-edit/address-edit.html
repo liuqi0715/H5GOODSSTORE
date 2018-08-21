@@ -1,0 +1,230 @@
+<div class="app-container with-navbar with-tabbar" ng-controller="AddressEditController">
+
+    <div class="navbar fixed-top">
+        <div class="navbar-left hide-weixin" ng-click="goBack()">
+            <img class="button-icon" src="image/nav-left.png"/>
+            <div class="button-text">返回</div>
+        </div>
+        <div class="navbar-title">
+          收货地址
+        </div>
+        <div class="navbar-right">
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="address-form">
+      <div class="form-item">
+        <div class="item-title">
+          联系姓名
+        </div>
+        <div class="item-input">
+          <input type="text" placeholder="填写姓名" ng-model="datas.consignee"/>
+        </div>
+      </div>
+      <div class="form-item">
+        <div class="item-title">
+          联系电话
+        </div>
+        <div class="item-input">
+          <input type="text" placeholder="填写手机号" ng-model="datas.mobilePhone"/>
+        </div>
+      </div>
+      <div class="form-item" ng-click="touchPickerShow()">
+        <div class="item-title">
+          所在地区
+        </div>
+        <div class="item-select">
+         {{ datas.pickerRegionName || '省、市、区'}}
+        </div>
+        <img class="item-arrow" src="image/nav-right.png"/>
+      </div>
+      <div class="form-item">
+        <div class="item-title">
+          详细地址
+        </div>
+        <div class="item-textarea">
+          <textarea type="text" placeholder="填写详细地址" ng-model="datas.address"></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Picker -->
+    <div id="addressFixed" ng-show="isDisappear">
+
+        <div class="toogle-address"  >
+
+            <div class="toogle-title">
+                请选择收货地址
+                <span class="icon-close" ng-click="reLoad()">×</span>
+            </div>
+            <div id="address2">
+
+                <div class="address-header">
+                    <span class="provice " ng-click="provice()" ng-class="{'address-now': hasPro == true}">{{proSNAME||"请选择"}}</span>
+                    <span class="city" ng-click="city()" ng-if="hasSECity" ng-class="{'address-now': hasCity == true}">{{citySNAME||"请选择"}}</span>
+                    <span class="area" ng-click="area()" ng-if="hasSEArea"  ng-class="{'address-now': hasArea == true}">{{areaSNAME||"请选择"}}</span>
+                    <span class="town" ng-click="town()" ng-if="hasSETown"  ng-class="{'address-now': hasTown == true}">{{townSNAME||"请选择"}}</span>
+                    <span class="stree" ng-click="stree()" ng-if="hasSEStree"  ng-class="{'address-now': hasStree == true}">{{streeSNAME||"请选择"}}</span>
+                </div>
+                <!-- onclick="address(this)" -->
+                <div id="address-info" >
+                    <ul id="provice" >
+                        <li ng-repeat="  pro in provinceList track by $index" ng-click="selectPro(pro.provinceName,pro.provinceId,pro)" >
+                            <span ng-class="active==pro.provinceId?'btn-default':'btn-primary'"> {{pro.provinceName}}</span>
+                        </li>
+                    </ul>
+                    <ul id="city">
+                        <li ng-repeat="city in cityList track by $index" ng-click="selectCity(city.cityName,city.cityId,city)">
+                            <span ng-class="activeCity==city.cityId?'btn-default':'btn-primary'" > {{city.cityName}}</span>
+                        </li>
+                    </ul>
+                    <ul id="area">
+                        <li ng-repeat="area in areaList track by $index" ng-click="selectArea(area.areaName,area.areaId,area)">
+                            <span ng-class="activeArea==area.areaId?'btn-default':'btn-primary'"> {{area.areaName}}</span>
+                        </li>
+                    </ul>
+                    <ul id="town">
+                        <li ng-repeat="stree in streetList track by $index" ng-click="selectTown(stree.stName,stree.stId,stree)">
+                            <span ng-class="activeStree==stree.stId?'btn-default':'btn-primary'">  {{stree.stName}}</span>
+                        </li>
+                    </ul>
+                    <ul id="stree">
+                        <li ng-repeat="country in countryList" ng-click="selectCountry(country.countryName,country.countryId,1)">
+                            <span  ng-class="activeCountry==stree.countryId?'btn-default':'btn-primary'"> {{country.countryName}}</span>
+                        </li>
+                    </ul>
+                </div>
+                <img src="image/loading.gif" alt="" ng-if="loading" class="loading">
+            </div>
+        </div>
+    </div>
+
+<!--Submit-->
+    <div class="address-action">
+        <div class="bar-cancel" ng-click="touchcancel()">
+            取消
+        </div>
+        <div class="bar-save" ng-click="touchSave()">
+            保存
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- Submit -->
+    <div class="address-bar" ng-if="datas.sraId">
+        <div class="bar-delete" ng-click="touchDelete(datas)">
+            删除地址
+        </div>
+    </div>
+    
+    <div class="address-bar" ng-if="datas.sraId && datas.isDefault==0 || addAddress==true">
+        <div class="bar-delete" style="background:#f34953;color:#FFF;" ng-click="touchSetDefault(datas)">
+            设为默认
+        </div>
+    </div>
+</div>
+
+<style >
+    #addressFixed{
+        height: 100%;
+        width: 100%;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        background: rgba(0, 0, 0, 0.2);
+        z-index: 99;
+        opacity: 1;
+    }
+    .toogle-title{
+        height: 40px;
+        line-height: 40px;
+        font-size: 12px;
+        text-align: center;
+    }
+    .icon-close{
+        height: 25px;
+        width: 25px;
+        line-height: 25px;
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        font-size: 20px;
+    }
+    .toogle-address{
+        height: 300px;
+        width: 100%;
+        background: white;
+        position: fixed;
+        z-index: 99;
+        bottom: 0;
+        left: 0;
+        /* display: none; */
+    }
+    #address2{
+        position: relative;
+    }
+    .address-header{
+        height: 40px;
+        line-height: 40px;
+        padding-left:10px;
+        z-index: 99;
+    }
+    .address-now::after{
+        position: absolute;
+        content: "";
+        left: 0;
+        bottom: -3px;
+        background: red;
+        height: 2px;
+        width: 100%;
+    }
+    #address-info{
+        width: 500%;
+        overflow-y: scroll;
+    }
+    .address-header span{
+        position: relative;
+        height: 30px;
+        font-size: 14px;
+        margin-left: 10px;
+        float: left;
+    }
+    #address-info ul{
+        width: 20%;
+        height: 250px;
+        float: left;
+        padding: 13px;
+        overflow-x: scroll;
+        padding-top: 0;
+        box-sizing: border-box;
+    }
+    ul li{
+        font-size: 14px;
+        list-style: none;
+        line-height: 30px;
+    }
+    .btn-primary{
+        color: black;
+    }
+    .btn-default{
+        color: red;
+    }
+    .loading{
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        left: 45%;
+        top: 45%;
+        z-index: 999;
+    }
+</style>
