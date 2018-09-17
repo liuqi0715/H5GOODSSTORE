@@ -1,0 +1,43 @@
+<div class="app-container with-navbar" ng-controller="ExpressSelectController">
+
+    <div class="navbar fixed-top">
+        <div class="navbar-left hide-weixin" ng-click="goBack()">
+            <img class="button-icon" src="image/nav-left.png"/>
+            <div class="button-text">返回</div>
+        </div>
+        <div class="navbar-title">
+          配送方式
+        </div>
+        <div class="navbar-right">
+        </div>
+    </div>
+
+    <div class="app-content">
+
+      <!-- Express -->
+      <div class="express-list" ng-if="shipList && shipList.length">
+        <div class="list-item" ng-class="{active: shipListItem.check}" ng-repeat="shipListItem in shipList track by $index" ng-click="touchVendor($index)">
+          <div class="item-checkbox"></div>
+          <div class="item-name">{{shipListItem.shippingName}}</div>
+         <!--  <div class="item-price">{{shipListItem.fee | currency:"￥"}}</div> -->
+        </div>
+      </div>
+        <div  ng-if="!shipList || shipList.length==0" class="noShipList">
+            该商品不在此区域内售卖,请核实您的收货地址。
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    .noShipList{
+        text-align: center;
+        height: 30px;
+        line-height: 30px;
+        font-size: 16px;
+        position: fixed;
+        top: 40%;
+        width: 100%;
+    }
+</style>
