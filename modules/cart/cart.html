@@ -1,0 +1,191 @@
+<div class="app-container with-navbar" ng-controller="CartController">
+
+    <div class="navbar fixed-top">
+        <div class="navbar-left hide-weixin" ng-click="goBack()">
+            <img class="button-icon" src="image/nav-left.png"/>
+            <div class="button-text">返回</div>
+        </div>
+        <div class="navbar-title">
+          购物车（{{cartgroups.length}}）
+        </div>
+        <div class="navbar-right">
+        </div>
+    </div>
+    <!-- Cart item ng-if="cartgroups.isLoaded"-->
+    <div class="app-content">
+
+        <div class="cart-list">
+            <div class="goodbox" ng-repeat="shop in shopList track by $index">
+                <div class="goodsbox-title">
+                    <div class="store-checkbox" ng-click="storeSelect($index,shop)" ng-class="{storeChecked:shop.checkStore}">
+                    </div>
+                   <div class="store-img">
+                       <img src="{{shop.shopLogo}}"/>
+                   </div>
+                    <div class="store-name">
+                       {{shop.shopName}}
+                    </div>
+                </div>
+                <!--ng-class="{active: isSelected(goods)}"-->
+                <div class="list-item"   ng-class="{shortHeight: goods.activityDescription==null}" ng-repeat="goods in shop.goodCartList track by $index" >
+                    <!--ng-click="touchProduct(goods)"-->
+                    <div class="item-checkbox" ng-click="touchSelect($index,shop)" ng-class="{goodsChecked:goods.check}">
+                    </div>
+                    <div class="item-photo"  ng-click="touchProduct(goods)">
+                        <img src="image/understock.png" alt="库存不足" class="understock" ng-if="goods.understock">
+                        <img src="{{goods.thumbUrl}}"/>
+                    </div>
+                    <div class="item-info">
+                        <div class="info-delete" ng-click="touchDelete($index,shop)">
+                            <img src="image/ind-delete.png">
+
+                        </div>
+                        <div class="info-name">
+                            {{goods.goodName}}
+                        </div>
+                        <div class="info-attr">
+                            {{goods.properties}}
+                        </div>
+                        <div class="info-activity" ng-if="goods.activityDescription!=null">
+                            {{goods.activityDescription==null?"":goods.activityDescription}}
+
+                        </div>
+                        <div class="info-time" ng-if="goods.activityTime!=null">
+                            活动时间:{{goods.activityTime}}
+
+                        </div>
+                        <div class="info-price">
+                            {{goods.salePrice| currency:"￥"}}
+                        </div>
+                        <div class="info-amount">
+                            <div class="amount-button" ng-class="{active: goods.number > 1}" ng-click="touchnumberSub($index,shop)">
+                                <img src="image/ind-sub.png">
+                            </div>
+                            <div class="amount-count" ng-class="{active: goods.number > 0}">
+                                {{goods.number}}
+                            </div>
+                            <div class="amount-button" ng-class="{active: goods.number > 0}" ng-click="touchnumberAdd($index,shop)">
+                                <img src="image/ind-add.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Submit -->
+        <div class="cart-submit" ng-if="cartgroups.isLoaded && !cartModel.isEmpty">
+            <div class="submit-select" ng-click="touchSelectAll()">
+                <div class="select-checkbox" ng-class="{goodsChecked:selectAllState}">
+                </div>
+                全选
+            </div>
+            <div class="submit-total" ng-class="{active: selectedGoods && selectedGoods.length}">
+                <span class="total-price">{{selectedPrice| currency:"￥"}}</span>
+                <span class="total-price discount-price ">已优惠：{{selectDiscount | currency:"￥"}}</span>
+            </div>
+            <div class="submit-button dark" ng-class="{active: selectedAmount>0}" ng-click="touchSubmit()">
+                结算（{{selectedAmount}}）
+            </div>
+        </div>
+
+        <!-- Dialog -->
+        <div id="dialog" ng-show="showDialog" ng-if="cartgroups.isLoaded">
+            <div class="mask">
+            </div>
+            <div class="dialog danger">
+                <div class="dialog-title">
+                    确认删除
+                </div>
+                <div class="dialog-content">
+                    是否要删除选中商品
+                </div>
+                <div class="dialog-button">
+                    <div class="button left" ng-click="touchDialogCancel()">
+                        取消
+                    </div>
+                    <div class="button right" ng-click="touchDialogConfirm()">
+                        确认
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty" ng-if="$scope.shopList.length==0">
+            <div class="empty-item">
+                <img class="item-logo" ng-src="image/icon-cart-empty.png"/>
+                <div class="item-text">您的购物车是空的</div>
+                <div class="item-button" ng-click="goHome()">随便逛逛</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .item-photo{
+        position: relative;
+    }
+    .understock{
+        position: absolute;
+        opacity:0.6;
+    }
+    .goodsbox-title{
+        width: 100%;
+        height: 30px;
+        border-bottom: 1px solid #e2e2e2;
+        background-color: white;
+    }
+    .store-img{
+        width: 30px;
+        height: 30px;
+        float: left;
+    }
+    .store-img img{
+        width: 100%;
+        vertical-align: middle;
+    }
+    .store-name{
+        float: left;
+        line-height: 30px;
+        text-align: left;
+        padding-left: 16px;
+    }
+    .store-checkbox{
+        width: 20px;
+        height: 20px;
+        background-image: url(image/check-off.png);
+        background-repeat: no-repeat;
+        background-size: cover;
+        float: left;
+
+        margin: 5px 10px 5px 10px;
+    }
+    .storeChecked{
+        background: url(image/check-on-multi.png) !important;
+        background-size: 100% 100% !important;
+    }
+    .app-container{
+        height: 100%;
+        background-color:#F3F3F3;
+    }
+    .goodbox{
+        margin-bottom: 20px;
+    }
+    .info-activity,.info-time{
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 20px;
+        line-height: 20px;
+        font-size: 12px;
+        color: red;
+    }
+    .shortHeight{
+        height: 110px !important;
+    }
+    .discount-price{
+        font-size: 12px !important;
+    }
+</style>
