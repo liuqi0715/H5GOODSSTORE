@@ -1,0 +1,160 @@
+<div class="app-container with-navbar with-tabbar" ng-controller="MyFavoriteController">
+
+    <div class="navbar fixed-top">
+        <div class="navbar-left hide-weixin" ng-click="goBack()">
+            <img class="button-icon" src="image/nav-left.png"/>
+            <div class="button-text">返回</div>
+        </div>
+        <div class="navbar-title">
+            我的收藏
+        </div>
+        <div class="navbar-right">
+        </div>
+    </div>
+
+    <!-- Favorite -->
+    <div class="app-content" infinite-scroll='myFavoriteModel.loadMore()'>
+
+        <div class="favorite-list" ng-if="myFavoriteModel.products && myFavoriteModel.products.length">
+
+            <div class="list-item" ng-repeat="product in myFavoriteModel.products track by $index" >
+                <div class="list-item-header" ng-if="product.collectList[0].shopRowNum==1" >
+                    <div class="store-img">
+                        <img src="{{product.shopLogo}}"/>
+                    </div>
+                    <div class="store-name">
+                        {{product.shopName}}
+                    </div>
+                </div>
+                <div class="list-item-goods" ng-repeat="good in product.collectList track by $index">
+                    <div class="item-photo" ng-click="touchProduct(good)">
+                        <img ng-src="{{good.pic}}"/>
+                    </div>
+                    <div class="item-info">
+                        <div class="info-delete" ng-click="touchDelete(good)">
+                            <img src="image/ind-delete.png">
+                        </div>
+                        <div class="info-name">
+                            {{good.goodsName}}
+                        </div>
+                        <div class="info-activity" ng-if="good.activityDescription!=null">
+                            {{good.activityDescription==null?"":good.activityDescription}}
+
+                        </div>
+                        <div class="info-time" ng-if="good.activityTime!=null">
+                            活动时间:{{good.activityTime}}
+
+                        </div>
+                        <div class="info-price">
+                            <span class="price-shop">{{good.salePrice| currency:"￥"}}</span>
+                            <span class="price-market">{{good.marketPrice| currency:"￥"}}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div id="dialog" ng-show="showDialog" ng-if="cartgroups.isLoaded">
+            <div class="mask">
+            </div>
+            <div class="dialog danger">
+                <div class="dialog-title">
+                    确认删除
+                </div>
+                <div class="dialog-content">
+                    是否要删除选中商品
+                </div>
+                <div class="dialog-button">
+                    <div class="button left" ng-click="touchDialogCancel()">
+                        取消
+                    </div>
+                    <div class="button right" ng-click="touchDialogConfirm()">
+                        确认
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="empty" ng-if="myFavoriteModel.isEmpty">
+            <div class="empty-item">
+                <img class="item-logo" ng-src="image/logo-favorite-empty.png"/>
+                <div class="item-text">暂无任何收藏</div>
+            </div>
+        </div>
+
+        <div class="loading-more" ng-if="myFavoriteModel.isLoaded && myFavoriteModel.isLoading">
+            正在加载...
+        </div>
+        <div class="loading-more" ng-if="myFavoriteModel.isLoaded && myFavoriteModel.isLastPage">
+            全部加载完毕
+        </div>
+
+    </div>
+
+</div>
+<style>
+    .list-item-header{
+        width: 100%;
+        height: 30px;
+        background-color: white;
+        padding-left: 10px;
+        border-bottom: #e2e2e2 1px solid;
+    }
+    .store-img{
+        width: 30px;
+        height: 30px;
+        float: left;
+    }
+    .store-img img{
+        width: 100%;
+        vertical-align: middle;
+    }
+    .store-name{
+        float: left;
+        line-height: 30px;
+        text-align: left;
+        padding-left: 16px;
+    }
+    .list-item-goods{
+        position: relative;
+        display: block;
+        width: 100%;
+         height: 110px;
+        box-sizing: border-box;
+        border-bottom: #e2e2e2 1px solid;
+        background-color: #ffffff;
+        padding: 10px 0;
+    }
+    .list-item-goods .item-photo{
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: block;
+        width: 90px;
+        height: 90px;
+        box-sizing: border-box;
+        border: #e2e2e2 1px solid;
+    }
+    .list-item-goods .item-photo img{
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        background-color: #ffffff;
+    }
+    .info-activity,.info-time{
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 20px;
+        line-height: 20px;
+        font-size: 12px;
+        color: red;
+    }
+    .shortHeight{
+        height: 110px !important;
+    }
+    .discount-price{
+        font-size: 12px !important;
+    }
+</style>
