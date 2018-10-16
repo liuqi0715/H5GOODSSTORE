@@ -1,0 +1,416 @@
+<div ng-controller="ProductController">
+  <div class="with-navbar with-tabbar">
+    <div class="navbar fixed-top">
+        <div class="navbar-left hide-weixin" ng-click="goBack()">
+			<div id="imbox">
+				<img class="button-icon" src="image/nav-left.png"/>
+			</div>
+            <div class="button-text">返回</div>
+        </div>
+        <div class="navbar-title">
+            商品详情
+        </div>
+    </div>
+    <div class="app-content" id="wrapper">
+   		<!-- Photo   infinite-scroll='loadProductDetails()'-->
+        <div id="scroller">
+           <div id="pullDown">
+           	  <div class="inner-center">
+		    	<span class="pullDownIcon"></span><span class="pullDownLabel">下拉刷新...</span>
+		      </div>
+		    </div> 
+	        <section>
+	        <div class="product-flash swiper-container" ng-if="isLoaded && product">
+	            <div class="swiper-wrapper">
+	                <div style="width:100%;" class="flash-slide swiper-slide" ng-repeat="photo in product.pic track by $index" ng-click="touchPhoto(photo)">
+	                    <img class="slide-image" ng-src="{{photo.pic}}"/>
+	                </div>
+	                <div class="flash-slide swiper-slide" ng-if="!product.pic|| !product.pic.length">
+	                    <img class="slide-image" ng-src="image/default-photo.png"/>
+	                </div>
+	            </div>
+	            <div class="swiper-pagination" ng-if="product.pic && product.pic.length > 1"></div>
+	        </div>
+	        </section>
+	        <!-- Info -->
+	        <div class="product-info" ng-if="isLoaded && product">
+	            <div class="info-name">{{product.goodsName}}</div>
+	            <div class="info-price">
+	                <span class="price-shop" ng-class="{danger: currentStock}">{{product.salePrice| currency:"￥"}}</span>
+	                <span class="price-market">{{product.marketPrice| currency:"￥"}}</span>
+					<span class="price-shop danger">{{product.activityDescription==null?"":product.activityDescription}}</span>
+	                <div class="activityTime">
+						活动时间：{{product.activityTime==null?"":product.activityTime}}
+						<span ng-if="product.limitedSurplusQuantity!==null">限购数量：{{product.limitedSurplusQuantity}}</span>
+					</div>
+					<div>
+	                  <span class="price-fee" ng-class="{danger: currentStock}">{{product.shipFree}} </span>
+					  <span class="price-sold">{{product.isAfterSale==0?"暂无售后":"优质售后"}}</span>
+	                  <span class="price-sold">  已销售{{product.saleCount}}</span>
+	                  <span class="price-sold" style="margin-left:20px;">  库存{{product.stockQuantity}}</span>
+					  <span class="price-sold" ng-if="product.limitedSurplusQuantity!==null&&product.limitedSurplusQuantity"> 限购数量：{{product.limitedSurplusQuantity}}</span>
+	                </div>
+	            </div>
+	            <div class="info-favorite" ng-click="touchLike(product)">
+	                <img src="image/favorite-off.png" ng-if="!product.isCollect"/>
+	                <img src="image/favorite-on.png" ng-if="product.isCollect"/>
+	            </div>
+	        </div>
+	
+	        <!-- Amount -->
+	       <div class="product-amount" ng-if="isLoaded && product && product.skuId == -1 && product.status==2" ng-click="selectClick()">
+	            <div class="amount-name" style="position:relative;">请选择分类</div>
+	       </div>
+			<!--Store-->
+			<div class="product-store">
+				<div class="product-storeLogo">
+					<img src="{{product.shopLogo}}" alt="">
+				</div>
+				<div class="product-storeName">
+					<div class="ps-name">
+						{{product.shopName}}
+					</div>
+					<div class="ps-crown">
+						<div class="crown">
+							<img src="image/crown.png" alt="">
+						</div>
+						<div class="ps-character">
+							<div class="company-logo">
+								<img src="image/company.png" alt="">
+							</div>
+							<div class="company-name">
+								企业店铺
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="product-storeLevel">
+					<img src="image/gold-medal.png" alt="">
+				</div>
+			</div>
+	
+	        <!-- Comment -->
+	        <div class="product-comment" ng-if="isLoaded && product && comments && comments.length">
+	            <div class="comment-header" ng-click="touchComments()">
+	                <img class="header-arrow" src="image/nav-right.png"/>
+	                <div class="header-title">商品评价（{{comments.length}}）</div>
+	            </div>
+	            <div class="comment-item" ng-repeat="comment in comments track by $index" ng-click="touchComment(comment)">
+	                <div class="item-info">
+	                    <span class="user">{{comment.is_anonymous ? '匿名用户' : comment.author.nickname}}</span>
+	                    <span class="rate">{{formatGrade(comment.grade)}}</span>
+	                    <span class="time">{{comment.created_at | localTime}}</span>
+	                </div>
+	                <div class="item-body">
+	                    {{comment.content}}
+	                </div>
+	                <div class="comment-line" ng-if="comment !== comments[comments.length-1]"></div>
+	            </div>
+	        </div>
+	
+	        <!-- Introduction -->
+	        <div class="product-intro" ng-if="isLoaded && product">
+	            <div class="intro-header">
+	                商品介绍
+	            </div>
+	            <!-- <div class="intro-content" ng-bind-html="(product.content || '没有产品详情') | trustHtml"> -->
+	        </div>
+			<div id="pullUpbox">
+				<div id="pullUp">
+					<div class="inner-center">
+						<span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多...</span>
+					</div>
+				</div>
+			</div>
+
+
+	        <div class="intro-content" ng-show="productContent" id="pContent">
+	            
+	        </div>
+	
+	        <!-- Tips -->
+
+	        
+	    </div><!-- scroll 结束处 -->
+	
+	    <div class="view" ng-if="proPaneShow">
+	       <div class="product-pane" id="pro" style="display:none;">
+	         <div class="product-attrImg">
+	            <img ng-src="{{showPic}}" width="100%" height="100%"/>
+	         </div>
+	         <div class="product-priceTag">{{proPrice| currency:"￥"}}</div>
+	         <div class="product-storeTag">库存 {{proStore}}</div>
+	         <div class="product-slcTag">{{proSelected}}</div>
+	         <div class="product-close" ng-click="paneHide()">
+	            <img src="image/ind-add.png" width="100%" height="100%" alt="close"/>
+	         </div>
+	         <section class="product-con">
+		         <div class="product-attr" ng-if="isLoaded && product && product.goodsAttr && product.goodsAttr.length && product.skuId == -1 ">
+		             <div class="attr-group" ng-init="parentId = $index" ng-repeat="property in product.goodsAttr track by $index">
+		                 <div class="group-name">{{property.attrName}}</div>
+		                 <div class="group-items">
+		                     <div class="group-item" ng-class="{active: value.check==1 && value.sign==1,noFuc:value.sign==0}" ng-init="childId = $index" ng-repeat="value in property.attrValueList track by $index" ng-click="touchAttr(property,value,parentId,childId)">
+		                         {{value.attrValue}}
+		                         <span ng-if="value.attr_price > 0">
+		                             (加{{value.attr_price| currency:"￥"}})
+		                         </span>
+		                     </div>
+		                 </div>
+		                 <div class="attr-line" ng-if="attr !== product.attrs[product.attrs.length-1]"></div>
+		             </div>
+		         </div>
+		    
+		         <div class="product-amount" ng-if="isLoaded && product && product.status!=1">
+		                <div class="amount-name">数量</div>
+		                <div class="amount-input" ng-class="{active: product.status==1}">
+		                    <div class="input-button" ng-class="{active: proStore > 1}" ng-click="touchAmountSub()">
+		                        <img src="image/ind-sub.png">
+		                    </div>
+							<div class="input-con">
+								<input type="text" class="input-count" ng-class="{active: proStore > 0}" ng-model="input.currentAmount"  ng-focus="checkdis()"  ng-blur="recover()" ng-change="refreshAmount()">
+							</div>
+		                    <div class="input-button" ng-class="{active: proStore > 0}" ng-click="touchAmountAdd()">
+		                        <img src="image/ind-add.png">
+		                    </div>
+		                </div>
+		         </div>
+	         </section>
+	       </div>
+	    </div>
+	</div>
+  </div>
+	<div class="product-tips" ng-if="isLoaded && product && product.stock==0">
+		所选商品暂时无货，非常抱歉！
+	</div>
+  <!-- Submit -->
+	<div class="hassoldout" ng-if="product.status!=2">
+		商品已下架
+	</div>
+<div class="product-submit fixed-bottom" ng-if="isLoaded && product" style="position:fixed !important;">
+    <div class="submit-cart" ng-click="touchCart()">
+        <img class="cart-icon" src="image/ind-cart.png">
+        <div class="cart-badge" ng-if="cartModel.total > 0">
+            {{cartModel.total}}
+        </div>
+    </div>
+    <div class="submit-button" ng-class="{active: product.stockQuantity>0 && product.status==2}" ng-click="touchAddCart()" >
+        加入购物车
+    </div>
+    <div class="submit-button dark" ng-class="{active: product.stockQuantity>0 && product.status==2}" ng-click="touchPurchase()">
+        立即购买
+    </div>
+</div>
+</div>
+<style>
+	/*店铺名称*/
+.product-store{
+	width: 100%;
+	height: 55px;
+	font-size: 14px;
+	margin-top: 15px;
+	border-top: #e2e2e2 1px solid;
+	border-bottom: #e2e2e2 1px solid;
+	padding: 8px;
+}
+.product-storeLogo{
+	width: 15%;
+	height: 55px;
+	float: left;
+
+}
+.company-logo img,.crown img{
+	width: 15px;
+}
+.company-name,.ps-name{
+	font-size: 15px;
+}
+.product-storeLogo img{
+ 	width: 100%;
+	height: 100%;
+ }
+.product-storeName{
+	width: 67%;
+	height: 55px;
+	float: left;
+	margin-left: 3%;
+	padding-top: 5px;
+}
+.ps-character{
+	margin-left: 6px;
+}
+.ps-name{
+	height: 25px;
+	line-height: 25px;
+	letter-spacing: 2px;
+}
+.ps-crown{
+	height: 25px;
+	line-height: 25px;
+}
+.crown{
+	float: left;
+	width: 15px;
+}
+.ps-character,.company-logo,.company-name{
+	float: left;
+}
+.product-storeLevel{
+	width: 15%;
+	height: 55px;
+	float: left;
+}
+.product-con{
+	position:absolute;
+	width:100%;
+	height:auto;
+	overflow:scroll;
+	top:70px;
+	left:0;
+	bottom:124px;
+	background: white;
+}
+.intro-words{
+	width:100%;
+	height:40px;
+	line-height:40px;
+	text-align:center;
+	font-size:12px;
+	background:rgba(255,255,255,.5);
+}
+#wrapper {
+	position: absolute;
+	z-index: 1;
+	top: 45px;
+	bottom: 48px;
+	height:auto;
+	left: 0;
+	width: 100%;
+	overflow: hidden;
+}
+
+#scroller {
+	position: absolute;
+	z-index: 1;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	width: 100%;
+	-webkit-transform: translateZ(0);
+	-moz-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	-o-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-text-size-adjust: none;
+	-moz-text-size-adjust: none;
+	-ms-text-size-adjust: none;
+	-o-text-size-adjust: none;
+	text-size-adjust: none;
+}
+/**
+ *
+ * 下拉样式 Pull down styles
+ *
+ */
+#imbox{
+	vertical-align: middle;
+}
+#pullUpbox{
+	/*height: 300px;*/
+}
+#pullDown, #pullUp {
+	 position:relative;
+	 background:#fff;
+	 height:40px;
+	 line-height:40px;
+	 padding:5px 10px;
+	 font-weight:bold;
+	 font-size:14px;
+	 color:#888;
+}
+#pullDown .pullDownIcon, #pullUp .pullUpIcon {
+	 display:block;
+	 float:left;
+	 width:24px;
+	 height:24px;
+	 margin:8px 10px 0 0;
+	 background:url(image/button-top.png) 0 0 no-repeat;
+	 -webkit-background-size:100% 100%; 
+	 background-size:100% 100%;
+	 -webkit-transition-property:-webkit-transform;
+	 -webkit-transition-duration:250ms; 
+}
+#pullDown .pullDownIcon {
+	 -webkit-transform:rotate(-180deg) translateZ(0);
+}
+#pullUp .pullUpIcon {
+ 	-webkit-transform:rotate(0deg) translateZ(0);
+}
+
+
+/**
+ * 动画效果css3代码
+ */
+#pullDown.flip .pullDownIcon {
+ 	-webkit-transform:rotate(-180deg) translateZ(0);
+}
+
+#pullUp.flip .pullUpIcon {
+ 	-webkit-transform:rotate(0deg) translateZ(0);
+}
+
+#pullDown.loading .pullDownIcon, #pullUp.loading .pullUpIcon {
+	 background-position:0 100%;
+	 -webkit-transform:rotate(0deg) translateZ(0);
+	 -webkit-transition-duration:0ms;
+	
+	 -webkit-animation-name:loading;
+	 -webkit-animation-duration:2s;
+	 -webkit-animation-iteration-count:infinite;
+	 -webkit-animation-timing-function:linear;
+}
+
+@-webkit-keyframes loading {
+	 from { -webkit-transform:rotate(0deg) translateZ(0); }
+	 to { -webkit-transform:rotate(360deg) translateZ(0); }
+}
+.product-amount .amount-input{
+	opacity: 1;
+}
+	/*商品已下架*/
+
+.hassoldout{
+	width: 100%;
+	height: 25px;
+	line-height: 25px;
+	font-size: 16px;
+	background: #666666;
+	color:white;
+	position: fixed;
+	top: auto;
+	bottom: 44px;
+	text-align: center;
+	z-index: 100;
+}
+	.activityTime{
+		font-size: 14px;
+	}
+	@media only screen and (max-width: 325px) {
+		.activityTime{
+			font-size: 12px;
+		}
+		.activityTime span{
+			font-size: 12px;
+		}
+		.product-info .info-price .price-shop{
+			font-size: 12px;
+		}
+	}
+	@media only screen and (max-width: 380px){
+		.product-info .info-price .price-shop{
+			font-size: 15px !important;
+		}
+	}
+</style>
