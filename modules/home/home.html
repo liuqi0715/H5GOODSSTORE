@@ -1,0 +1,134 @@
+<div ng-controller="HomeController" id="scroll-content-listen">
+<div class="app-container with-navbar with-tabbar">
+
+    <div class="navbar fixed-top">
+        <div id="indexBack" ng-click="gobackHis()">
+            <img ng-src="image/back.png" alt="返回">
+        </div>
+        <div class="search" ng-click="touchSearch()">
+            <img class="search-icon" ng-src="image/ind-search.png"/>
+            <span class="search-text">请输入您要搜索的商品</span>
+        </div>
+    </div>
+
+    <div class="app-content">
+        <!-- Banner -->
+        <div class="home-banner swiper-container" ng-if="banners && banners.length">
+            <div class="swiper-wrapper">
+                <div class="banner-slide swiper-slide" ng-repeat="banner in banners track by $index" ng-click="touchBanner(banner)">
+                    <img ng-src="{{banner.imageUrl || 'image/default-photo.png'}}" class="slide-image"/>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <!-- Menu -->
+        <div class="home-menu">
+            <div class="menu-item" ng-click="goCategory()">
+                <img class="item-icon" ng-src="image/home-category.png"/>
+                <div class="item-text">分类</div>
+            </div>
+            <div class="menu-item" ng-click="goMyOrder()">
+                <img class="item-icon" ng-src="image/home-order.png"/>
+                <div class="item-text">订单</div>
+            </div>
+            <div class="menu-item" ng-click="goMyFavorite()">
+                <img class="item-icon" ng-src="image/home-favorite.png"/>
+                <div class="item-text">收藏</div>
+            </div>
+            <div class="menu-item" ng-click="goCart()">
+                <img class="item-icon" ng-src="image/home-cart.png"/>
+                <div class="item-text">购物车</div>
+            </div>
+        </div>
+
+        <!-- Notice -->
+        <div class="home-notice" ng-if="notices && notices.length">
+            <img class="notice-icon" ng-src="image/home-notice.png"/>
+            <div class="notice-vline"></div>
+            <div class="notice-slide swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide text-more" ng-repeat="notice in notices track by $index" ng-click="touchNotice(notice)">
+                        {{notice.title}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category -->
+        <!-- <div class="home-category" ng-if="categories && categories.length">
+            <div class="category-item" ng-repeat="category in categories track by $index" ng-click="touchCategory(category)">
+                <img class="item-photo" ng-src="image/default-photo.png" lazy-img="{{category.photo.large}}"/>
+                <div class="item-mask"></div>
+                <div class="item-text">{{category.name}}</div>
+            </div>
+        </div> -->
+
+
+        <!-- Editor Choices -->
+        <div class="home-product" ng-if="homeList && homeList.length" ng-repeat="block in homeList track by $index">
+            <div class="product-header">
+                 <!--<img class="header-arrow" ng-src="image/nav-right.png"/>-->
+                <div class="header-title">{{block.tagName}}</div>
+                <div class="header-more" ng-click="getMoreList(block)">
+                    更多
+                    <img src="image/more.png" alt="更多">
+                </div>
+            </div>
+            <div class="product-item" ng-click="touchProduct(product); $event.stopPropagation();" ng-repeat="product in block.goodsList track by $index">
+                <div class="item-photo">
+                    <img ng-src="{{product.pic}}" lazy-img="{{product.pic}}"/>
+                </div>
+                <div class="item-name">{{product.goodsName || '-'}}</div>
+                <div class="item-store" ng-if="product.shopName"><span>{{product.shopName}}</span><span>销量：{{product.saleCount}}</span></div>
+                <div class="item-price">{{product.salePrice | currency:"￥"}} <span ng-if="product.actName!=null">{{product.actName==null?"":product.actName}}</span></div>
+            </div>
+        </div>
+
+    </div>
+    <ion-infinite-scroll
+            on-infinite="loadMore()"
+            distance="1%">
+    </ion-infinite-scroll>
+</div>
+<div class="tabbar fixed-bottom" style="position:fixed !important;">
+  <div class="tab active" ng-click="goHome()">
+    <img class="tab-icon" ng-src="image/tab-home-active.png"/>
+  </div>
+  <div class="tab" ng-click="goCategory()">
+    <img class="tab-icon" ng-src="image/tab-category-normal.png"/>
+  </div>
+  <div class="tab" ng-click="goCart()">
+    <img class="tab-icon" ng-src="image/tab-cart-normal.png"/>
+    <div class="tab-badge" ng-if="cartModel.total > 0">
+        {{cartModel.total}}
+    </div>
+  </div>
+  <div class="tab" ng-click="goProfile()">
+    <img class="tab-icon" ng-src="image/tab-profile-normal.png"/>
+  </div>
+</div>
+</div>
+
+<style>
+    .header-more{
+        position: absolute;
+        right: 8px;
+        top: 0px;
+        display: block;
+        width: 100px;
+        height: 44px;
+        line-height: 44px;
+        box-sizing: border-box;
+        text-align: right;
+        font-size: 14px;
+        padding-right: 20px;
+    }
+    .header-more img{
+        position: absolute;
+        top: 9px;
+        right: 4px;
+        width: 24px;
+        vertical-align: middle;
+    }
+</style>
