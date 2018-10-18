@@ -1,0 +1,152 @@
+<div ng-controller="OrderDetailController">
+	<div class="app-container with-navbar with-tabbar">
+	    <div class="navbar fixed-top">
+	        <div class="navbar-left hide-weixin" ng-click="goBack()">
+	            <img class="button-icon" ng-src="image/nav-left.png"/>
+	            <div class="button-text">返回</div>
+	        </div>
+	        <div class="navbar-title">
+	          订单详情
+	        </div>
+	    </div>
+	
+	    <div class="app-content" ng-if="isLoaded">
+	
+	        <!-- Status -->
+	        <div class="order-status" ng-if="orderDetails.status == 1">
+	            <img ng-src="image/icon-order-light.png">等待买家付款
+	        </div>
+	        <div class="order-status" ng-if="orderDetails.status == 2">
+	            <img ng-src="image/icon-order-light.png">待发货
+	        </div>
+	        <div class="order-status" ng-if="orderDetails.status == 3">
+	            <img ng-src="image/icon-order-light.png">已收货
+	        </div>
+	        <div class="order-status" ng-if="orderDetails.status == 4">
+	            <img ng-src="image/icon-order-light.png">交易取消
+	        </div>
+	        <!-- Address -->
+	        <div class="order-address">
+	            <div class="address-contact">
+	                {{orderDetails.consignee}} {{orderDetails.mobile}}
+	            </div>
+	            <div class="address-detail">
+	                {{orderDetails.province}}&nbsp;&nbsp;{{orderDetails.city}}&nbsp;&nbsp;{{orderDetails.district}}
+	                &nbsp;
+	                <p style="font-size:12px;margin-top:5px;">{{orderDetails.address}}</p>
+	            </div>
+	        </div>
+	
+	        <!-- Goods -->
+	        <div class="order-goods">
+	            <div class="goods-item" ng-repeat="goods in orderDetails.goodList track by $index">
+	                <div class="item-photo">
+	                    <img ng-src="{{goods.img}}" lazy-img="{{goods.img}}" ng-click="touchProduct(goods)"/>
+	                </div>
+	                <div class="item-info">
+	                    <div class="info-name">
+	                        {{goods.goodsName}}
+	                    </div>
+	                    <div class="info-attr">
+	                        {{goods.propertiesName}}
+	                    </div>
+	                    <div class="info-price">
+	                        {{goods.salePrice| currency:"￥"}}
+	                    </div>
+	                    <div class="info-amount">
+	                        x{{goods.number}}
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	
+	        <!-- Total -->
+	        <div class="order-summury">
+	            <div class="summury-detail">
+	                运费金额 <span class="total-price"> {{orderDetails.shippingFee| currency:"￥"}}</span>
+	            </div>
+	
+	            <div class="summury-detail" ng-repeat="promo in promos track by $index">
+	                {{ promo.name }} <span class="total-price">- {{promo.price| currency:"￥"}}</span>
+	            </div>
+	
+	
+	            <div class="summury-total">
+	                订单总价 <span class="total-price">{{orderDetails.orderAmount| currency:"￥"}}</span>
+	            </div>
+	        </div>
+	
+	        <!-- Info -->
+	        <div class="order-info">
+	            <div class="info-text">
+	                订单编号：#{{orderDetails.orderNo}}
+	            </div>
+	            <div class="info-text">
+	                创建时间：{{orderDetails.addTime}}
+	            </div>
+	            <div class="info-text" ng-if="order.updated_at">
+	                更新时间：{{orderDetails.updated_at}}
+	            </div>
+	            <div class="info-text" ng-if="orderDetails.payTime">
+	                支付时间：{{orderDetails.payTime}}
+	            </div>
+	            <div class="info-text" ng-if="orderDetails.shippingTime">
+	                发货时间：{{orderDetails.shippingTime}}
+	            </div>
+	            <div class="info-text" ng-if="orderDetails.receiveTime">
+	                完成时间：{{orderDetails.receiveTime}}
+	            </div>
+	            <div class="info-text" ng-if="order.canceled_at">
+	                取消时间：{{orderDetails.canceled_at | localTime}}
+	            </div>
+	        </div>
+	
+        <!-- Dialog -->
+        <div id="dialog" ng-show="showDialog">
+            <div class="mask">
+            </div>
+            <div class="dialog danger">
+                <div class="dialog-title" ng-show="cancellingOrder!=null">
+                    确认取消
+                </div>
+                <div class="dialog-content" ng-show="cancellingOrder!=null">
+                    是否取消该订单
+                </div>
+                <div class="dialog-title" ng-show="cancellingOrder==null">
+                  确认收货
+                </div>
+                <div class="dialog-content" ng-show="cancellingOrder==null">
+					您是否要确认收货吗？
+                </div>
+                <div class="dialog-button">
+                    <div class="button left" ng-click="touchDialogCancel()">
+                        取消
+                    </div>
+                    <div class="button right" ng-click="touchDialogConfirm()">
+                        确认
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+	    </div>
+	</div>
+    <!-- Submit -->
+    <div class="order-submit fixed-bottom" style="position:fixed;" ng-if="orderDetails.orderStatus != 1 && orderDetails.orderStatus != 3">
+        <div class="submit-button dark" ng-if="orderDetails.payStatus == 0" ng-click="touchPay()">
+            付款
+        </div>
+        <div class="submit-button" ng-if="orderDetails.status == 4" ng-click="touchCancel(orderDetails)">
+            取消订单
+        </div>
+        <div class="submit-button dark" ng-if="orderDetails.status == 2" ng-click="touchConfirm(orderDetails)">
+            确认收货
+        </div>
+        <div class="submit-button dark" ng-if="orderDetails.status == 3" ng-click="touchComment()">
+            评价
+        </div>
+        <div class="submit-button" ng-if="orderDetails.shippingStatus == 1" ng-click="touchExpress()">
+            查看物流
+        </div>
+    </div>
+</div>
