@@ -1,0 +1,53 @@
+<div class="app-container with-navbar" ng-controller="SearchController">
+
+    <div class="navbar fixed-top">
+        <div class="search-inline">
+            <img class="search-icon" src="image/ind-search.png" ng-click="touchSearch()"/>
+            <input class="search-text" ng-model="search.input" placeholder="请输入您要搜索的商品"></input>
+        </div>
+        <div class="search-in" ng-click="touchSearch()">搜索</div>
+        <div class="search-cancel" ng-click="goBack()">
+            <div id="imbox">
+            <img class="button-icon" src="image/nav-left.png"/>
+                返回
+            </div>
+
+        </div>
+    </div>
+
+    <div class="app-content">
+        <div class="search-header" ng-if="history && history.length">
+            <img class="header-icon" src="image/ind-history.png"/>
+            最近搜索
+        </div>
+        <div class="search-keywords" ng-if="history && history.length">
+            <div class="keyword" ng-repeat="keyword in history track by $index" ng-click="touchKeyword(keyword)">{{keyword.key_word}}</div>
+        </div>
+        <div class="search-header" ng-if="keywords && keywords.length">
+            <img class="header-icon" src="image/ind-hot.png"/>
+            热门搜索
+        </div>
+        <div class="search-keywords" ng-if="keywords && keywords.length">
+            <div class="keyword" ng-repeat="keyword in keywords track by $index" ng-click="touchKeyword(keyword.content)">{{keyword.content}}</div>
+        </div>
+    </div>
+    
+</div>
+<style>
+    #imbox{
+        width: 40px;
+        font-size: 12px;
+        position: relative;
+        text-align: right;
+    }
+    #imbox img{
+        width: 11px;
+        vertical-align: middle;
+        position: absolute;
+        left: 1px;
+        top: 11px;
+    }
+    .search-cancel{
+        left: 1px;
+    }
+</style>

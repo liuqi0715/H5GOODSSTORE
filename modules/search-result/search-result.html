@@ -1,0 +1,150 @@
+<div class="app-container with-navbar" ng-controller="SearchResultController">
+
+    <div class="navbar fixed-top" ng-if="navStyle == 'default'">
+        <div class="navbar-left hide-weixin" ng-click="goBack()">
+            <img class="button-icon" ng-src="image/nav-left.png"/>
+            <div class="button-text">返回</div>
+        </div>
+        <div class="navbar-title">
+          {{navTitle || '搜索结果'}}
+        </div>
+    </div>
+
+    <div class="navbar fixed-top" ng-if="navStyle == 'search'">
+        <div class="search-inline">
+            <img class="search-icon" ng-src="image/ind-search.png" ng-click="searchObj()"/>
+            <input class="search-text" placeholder="请输入您要搜索的商品" ng-model="searchInput.name">
+        </div>
+        <div class="search-in" ng-click="searchObj()">搜索</div>
+        <div class="search-cancel" ng-click="goHome()">
+            <div id="imbox">
+                <img class="button-icon" src="image/nav-left.png"/>
+                返回
+            </div>
+        </div>
+        <!--这里返回首页-->
+    </div>
+
+    <div class="app-content" infinite-scroll='loadMore()'>
+        <div class="search-filter">
+            <div class="filter-item" ng-class="{active: allActive}" ng-click="touchSortDefault()">
+                <span class="text">综合</span>
+            </div>
+            <div class="filter-item" ng-class="{active: saleActive}" ng-click="touchSortSale()">
+                <span class="text">销量</span>
+            </div>
+            <div class="filter-item" ng-class="{active: priceActive}" ng-click="touchSortPrice()">
+                <span class="text">价格</span>
+                <div class="arrow">
+                    <img class="ind" ng-class="{active : priceUpActive}" ng-src="image/ind-arrow-up.png"/>
+                    <img class="ind" ng-class="{active : !priceUpActive}" ng-src="image/ind-arrow-down.png"/>
+                </div>
+            </div>
+
+            <div class="filter-item" ng-class="{active: newActive}" >
+                <!--ng-click="touchSortNew()"-->
+                <div class="text"  ng-click="showTag()">{{defaultTag}}</div>
+                <div class="arrow">
+                    <img class="ind" ng-class="{active : styleUpActive}" ng-src="image/ind-arrow-up.png"/>
+                    <img class="ind" ng-class="{active : !styleUpActive}" ng-src="image/ind-arrow-down.png"/>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="search-style" ng-style="listHeight">
+            <div class="filfe-style" ng-repeat="tag in tagList track by $index"  ng-click="tagSearch(tag,$index)" ng-class="{selected:$index==select}">
+                {{tag.tagName}}
+                <span ng-if="$index==select"  ng-class="{selected:$index==select}" class="right">✔</span>
+            </div>
+        </div>
+        <div class="search-product" ng-if="products && products.length">
+            <div class="product-item" ng-repeat="product in products track by $index" ng-click="touchProduct(product)">
+                <div class="item-photo">
+                    <img ng-src="image/default-photo.png" lazy-img="{{product.pic}}"/>
+                </div>
+                <div class="item-name">{{product.goodsName}}</div>
+                <div class="item-footer">
+                    <div class="footer-price"> <span>{{product.shopName}}</span> <span class="footer-volume">销量：{{product.saleCount}}</span></div>
+                    <!--<div class="footer-sales"></div>-->
+
+                </div>
+                <div class="item-price">{{product.salePrice | currency:"￥"}} <span ng-if="product.actName!==null">{{product.actName}}</span></div>
+
+            </div>
+        </div>
+
+        <div class="empty" ng-if="isEmpty">
+            <div class="empty-item">
+                <img class="item-logo" ng-src="image/logo-product-empty.png"/>
+                <div class="item-text">暂无任何商品</div>
+            </div>
+        </div>
+
+        <div class="loading-more" ng-if="isLoaded && isLoading">
+            正在加载...
+        </div>
+        <div class="loading-more" ng-if="isLoaded && isLastPage">
+            全部加载完毕
+        </div>
+
+    </div>
+
+</div>
+<style>
+    #imbox{
+        width: 40px;
+        font-size: 12px;
+        position: relative;
+        text-align: right;
+    }
+    #imbox img{
+        width: 11px;
+        vertical-align: middle;
+        position: absolute;
+        left: 1px;
+        top: 11px;
+    }
+    .search-cancel{
+        left: 1px;
+    }
+    .item-price{
+        font-size: 10px;
+    }
+    .footer-price span{
+        font-size: 13px;
+    }
+    .footer-volume{
+        float: right;
+    }
+    .item-price span{
+        font-size: 13px;
+        display: initial;
+    }
+    .filfe-style{
+        height: 25px;
+        line-height: 25px;
+        border-bottom: #F2F2F2 solid 1px;
+        box-sizing: border-box;
+        padding-left: 10px;
+    }
+    .selected{
+        color: red;
+    }
+    .right{
+        float: right;
+        padding-right: 10px;
+    }
+    .app-content{
+        position: relative;
+    }
+    .search-style{
+        overflow: hidden;
+        height: 0;
+        width: 100%;
+        position: absolute;
+        top: 44px;
+        z-index: 9999;
+        background-color: white;
+    }
+</style>
